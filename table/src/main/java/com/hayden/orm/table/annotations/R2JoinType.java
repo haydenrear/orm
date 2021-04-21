@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface R2ManyToMany {
-    public String value() default "hello";
-    public Relationship direction() default Relationship.MANYTOMANYUNI;
+public @interface R2JoinType {
+    public Relationship relationship() default Relationship.ONETOONEUNI;
 }

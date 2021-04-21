@@ -1,12 +1,16 @@
 package com.hayden.orm.table.mapper;
 
+import com.hayden.orm.table.annotations.CollectionOrArray;
 import com.hayden.orm.table.annotations.ManyToMany;
+import com.hayden.orm.table.annotations.PrimitiveCollection;
 import com.hayden.orm.table.annotations.R2Column;
-import com.hayden.orm.table.annotations.R2ManyToMany;
+import com.hayden.orm.table.annotations.R2JoinType;
 import com.hayden.orm.table.annotations.TableName;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Stream;
 
 
 public class MetaMapper{
@@ -35,16 +39,17 @@ public class MetaMapper{
 
     }
 
-    // returning primitive here will catch Integer and Float
     private Relationship getRelationship(Class<?> table, Field f) {
         return Arrays.stream(f.getDeclaredAnnotations())
-                .map(annotation -> {
-                    if(annotation.getClass().isAssignableFrom(R2ManyToMany.class)){
-                        return f.getAnnotation(R2ManyToMany.class).direction();
-                    }
-                    else {
-                        return Relationship.ONETOONEUNI;
-                    }
+                .filter(annotation -> !annotation.annotationType().isPrimitive())
+                .map(Annotation::annotationType)
+                .flatMap(clzz -> {
+                    if(clzz.isAssignableFrom(R2JoinType.class))
+                        return Stream.of(clzz.getAnnotation(R2JoinType.class).relationship());
+                    else if(clzz.isAssignableFrom(PrimitiveCollection.class))
+                        return Stream.of(Relationship.ONETOMANYUNI);
+                    else
+                        return Stream.empty();
                 }).findFirst().orElse(Relationship.PRIMITIVE);
     }
 
