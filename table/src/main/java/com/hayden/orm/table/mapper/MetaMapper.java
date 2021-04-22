@@ -22,13 +22,15 @@ public class MetaMapper {
 
     public List<SqlColumn> getColumns(Class<?> table) throws MetaMappingException {
 
-        String[] primaryKey = table.getAnnotation(PrimaryKey.class).primaryKey();
+        var primaryKeyOptional = getPrimaryKey(table);
 
-        if(primaryKey.length == 0){
+        if(primaryKeyOptional.isEmpty()){
             throw new MetaMappingException();
         }
 
-        return Arrays.stream(table.getFields())
+        String primaryKey = primaryKeyOptional.get().getT2();
+
+        return Arrays.stream(table.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(R2Column.class))
                 .flatMap(field -> {
                     try {
@@ -41,7 +43,7 @@ public class MetaMapper {
     }
 
 
-    private SqlColumn getSqlColumn(Class<?> table, String[] primaryKey, Field f) throws MetaMappingException {
+    private SqlColumn getSqlColumn(Class<?> table, String primaryKey, Field f) throws MetaMappingException {
         if(ClassUtils.isPrimitiveOrWrapper(f.getType())){
             return new SqlColumn(SqlKey.PrimitiveSqlKey(primaryKey), f.getType());
         }
@@ -49,12 +51,12 @@ public class MetaMapper {
             throw new MetaMappingException();
         }
         else{
-            String[] foreignKey;
+            String foreignKey;
             if (isTableExisting(f.getType()) && f.isAnnotationPresent(R2JoinType.class)) {
                 R2JoinType r2JoinType = f.getAnnotation(R2JoinType.class);
                 return new SqlColumn(SqlKey.NewSqlKey(r2JoinType.relationship(), r2JoinType.foreignKey(), r2JoinType.primaryKey()), f.getType());
             }
-            else if ((foreignKey = biDirectional(table, f.getType())).length != 0) {
+            else if ((foreignKey = biDirectional(table, f.getType())).length() != 0) {
                 return new SqlColumn(SqlKey.NewSqlKey(primaryKey, foreignKey), f.getType());
             } else {
                 throw new MetaMappingException();
@@ -63,12 +65,12 @@ public class MetaMapper {
     }
 
     // get primary key from foreign key or return null if not bidirectional
-    private String[] biDirectional(Class<?> table, Class<?> aClass) {
-        return Arrays.stream(aClass.getFields()).map(Field::getType)
+    private String biDirectional(Class<?> table, Class<?> aClass) {
+        return Arrays.stream(aClass.getDeclaredFields()).map(Field::getType)
                 .filter(fieldClass -> fieldClass.isAssignableFrom(table))
                 .map(fieldClass -> fieldClass.getAnnotation(R2JoinType.class))
                 .map(R2JoinType::primaryKey)
-                .findFirst().orElse(new String[]{});
+                .findFirst().orElse("");
     }
 
     public boolean isTableExisting(Class<?> tableType){
@@ -83,9 +85,12 @@ public class MetaMapper {
     }
 
 
-    public Tuple2<Optional<Class<?>>, String[]> getPrimaryKey(Class<?> entity) {
-        String[] primaryKey = entity.getClass().getAnnotation(PrimaryKey.class).primaryKey();
-        return Tuples.of(Arrays.stream(entity.getFields()).filter(field -> field.isAnnotationPresent(PrimaryKey.class))
-                .findFirst().map(Field::getType), primaryKey);
+    public Optional<Tuple2<Class<?>, String>> getPrimaryKey(Class<?> entity) {
+        for (Field f : entity.getDeclaredFields()){
+            if(f.isAnnotationPresent(PrimaryKey.class)){
+                return Optional.of(Tuples.of(f.getType(), f.getAnnotation(PrimaryKey.class).primaryKey()));
+            }
+        }
+        return Optional.empty();
     }
 }

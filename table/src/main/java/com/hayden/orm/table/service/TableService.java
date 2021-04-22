@@ -1,16 +1,14 @@
-package com.hayden.orm.table;
+package com.hayden.orm.table.service;
 
-import com.hayden.orm.table.annotations.PrimaryKey;
 import com.hayden.orm.table.annotations.TableName;
 import com.hayden.orm.table.key.KeyType;
 import com.hayden.orm.table.mapper.*;
-import org.reflections.Reflections;
+import org.reflections8.Reflections;
+import org.springframework.util.ClassUtils;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TableService {
 
@@ -36,13 +34,15 @@ public class TableService {
 
     public Optional<SqlTable> getSqlTable(Class<?> entity){
         try {
-            Tuple2<Optional<Class<?>>, String[]> primaryKey = metaMapper.getPrimaryKey(entity);
+            var primaryKey = metaMapper.getPrimaryKey(entity);
+            if (primaryKey.isEmpty())
+                return Optional.empty();
             return Optional.of(
                     new SqlTable(metaMapper.getColumns(entity),
                         entity,
                         entity.getAnnotation(TableName.class).tableName(),
-                        primaryKey.getT2(),
-                        primaryKey.getT1().orElseGet(() -> String.class)
+                        primaryKey.get().getT2(),
+                        primaryKey.get().getT1()
                     )
             );
         } catch (MetaMappingException e) {
@@ -57,24 +57,25 @@ public class TableService {
         tables.forEach(table -> {
                stringBuilder.append("CREATE TABLE [IF NOT EXISTS] "+table.getTableName() +" (");
                stringBuilder.append("\n");
+               writeKey(stringBuilder, table.getPrimaryKey(), KeyType.PRIMARY, table.getClzz());
                table.getColumnList().forEach(sqlColumn -> {
-                   writeKey(stringBuilder, table.getPrimaryKey(), KeyType.PRIMARY, sqlColumn.getFieldType());
-                   stringBuilder.append(table.getPrimaryKey)
-                   stringBuilder.append(sqlColumn.getFieldType().getSimpleName()+" "+sqlColumn.getFieldType());
+                   if(ClassUtils.isPrimitiveOrWrapper(sqlColumn.getFieldType())){
+                       stringBuilder.append(sqlColumn.getFieldType().getSimpleName()+" "+DataType.getDataType(sqlColumn.getFieldType()));
+                   }
+                   else {
+                       stringBuilder.append(sqlColumn.getFieldType().getSimpleName()+" "+sqlColumn.getFieldType());
+                       writeKey(stringBuilder, sqlColumn.getSqlKey().getPrimaryKey(), KeyType.FOREIGN, sqlColumn.getFieldType());
+                   }
+                   stringBuilder.append(",\n");
                });
             });
         return stringBuilder.toString();
     }
 
-    private void writeKey(StringBuilder stringBuilder, String[] primaryKey, KeyType keyType, Class<?> fieldType) {
-        if(keyType == KeyType.PRIMARY){
-            stringBuilder.append(primaryKey[0]+" "+DataType.getDataType(fieldType));
-        }
+    private void writeKey(StringBuilder stringBuilder, String primaryKey, KeyType keyType, Class<?> fieldType) {
+        stringBuilder.append(" "+primaryKey+" "+DataType.getDataType(fieldType)+" "+keyType.toString());
     }
 
-    private DataType getDataType(Class<?> fieldType){
-
-    }
 
 
 }

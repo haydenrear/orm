@@ -16,4 +16,9 @@ public class SqlColumn{
         this.sqlKey = sqlKey;
         this.fieldType = fieldType;
     }
+
+    public DataType getDataType(){
+        return DataType.getDataType(fieldType);
+    }
+
 }

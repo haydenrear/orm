@@ -1,5 +1,7 @@
 package com.hayden.orm.table.mapper;
 
+import org.springframework.util.ClassUtils;
+
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -10,32 +12,39 @@ public enum DataType {
 
     bool,
     TEXT,
-    INT,
-    FLOAT{
+    INT{
         @Override
         public String toString() {
-            return "float(8)";
+            return "integer";
         }
     },
     DATE,
-    TIME;
+    DOUBLE{
+        @Override
+        public String toString() {
+            return "double precision";
+        }
+    },
+    TIME,
+    COMPLEX;
 
     String value;
 
     public static DataType getDataType(Class<?> classType) {
+        if(!ClassUtils.isPrimitiveOrWrapper(classType))
+            return COMPLEX;
         if(isAssignableFrom(classType, Boolean.class, boolean.class))
            return bool;
-        else if(isAssignableFrom(classType, Float.class, float.class))
-            return FLOAT;
         else if(isAssignableFrom(classType, Date.class, java.util.Date.class))
             return DATE;
-        else if(isAssignableFrom(LocalDateTime.class))
+        else if(isAssignableFrom(classType, LocalDateTime.class))
             return TIME;
-        else if(isAssignableFrom(Integer.class, int.class))
+        else if(isAssignableFrom(classType, Integer.class, int.class, long.class, Long.class))
             return INT;
-        else {
+        else if(isAssignableFrom(classType, Double.class, double.class, Float.class, float.class))
+            return DOUBLE;
+        else
             return TEXT;
-        }
     }
 
     public static boolean isAssignableFrom(Class<?> clzz, Class<?> ... classTypes){
@@ -43,7 +52,6 @@ public enum DataType {
                 .stream(classTypes)
                 .filter(clzz::isAssignableFrom)
                 .collect(Collectors.toList()).size() != 0;
-
     }
 
 }

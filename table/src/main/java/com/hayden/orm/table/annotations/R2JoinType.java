@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface R2JoinType {
-    public String[] foreignKey();
-    public String[] primaryKey();
+    public String foreignKey();
+    public String primaryKey();
     public Relationship relationship();
 }

@@ -32,4 +32,5 @@ class TableApplicationTests {
         assertThat(metaMapper.dataTypeFromField(field)).isEqualTo(DataType.INT);
     }
 
+
 }

@@ -13,7 +13,7 @@ public class SqlTable {
     List<SqlColumn> columnList;
     Class<?> clzz;
     String tableName;
-    String[] primaryKey;
+    String primaryKey;
     Class<?> primaryKeyType;
 
 }
