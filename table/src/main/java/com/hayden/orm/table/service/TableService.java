@@ -4,8 +4,8 @@ import com.hayden.orm.table.annotations.TableName;
 import com.hayden.orm.table.key.KeyType;
 import com.hayden.orm.table.mapper.*;
 import org.reflections8.Reflections;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
-import reactor.util.function.Tuple2;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,5 +1,7 @@
 package com.hayden.orm.table.service;
 
+import com.hayden.orm.table.key.KeyType;
+import com.hayden.orm.table.mapper.DataType;
 import com.hayden.orm.table.mapper.SqlTable;
 import com.hayden.orm.table.testentities.TestTwo;
 import org.junit.jupiter.api.Test;
@@ -20,9 +22,10 @@ public class TestTableService {
         assertThat(tableService.findEntities().size()).isEqualTo(2);
         Optional<SqlTable> sqlTable = tableService.getSqlTable(TestTwo.class);
         sqlTable.get().getColumnList().forEach(column -> {
-            assertThat(column.getSqlKey()).isEqualTo("id");
-            assertThat(column.getDataType()).isEqualTo("integer");
-            assertThat(column.getFieldType()).isEqualTo("int");
+            assertThat(column.getSqlKey().getPrimaryKey()).isEqualTo("id");
+            assertThat(column.getSqlKey().getKeyType()).isEqualTo(KeyType.PRIMITIVE);
+            assertThat(column.getDataType()).isEqualTo(DataType.INT);
+            assertThat(column.getFieldType()).isEqualTo(int.class);
         });
     }
 

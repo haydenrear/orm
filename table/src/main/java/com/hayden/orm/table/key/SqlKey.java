@@ -4,6 +4,7 @@ import com.hayden.orm.table.annotations.R2JoinType;
 import com.hayden.orm.table.mapper.DataType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
 @Data
