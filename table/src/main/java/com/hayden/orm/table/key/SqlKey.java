@@ -33,11 +33,6 @@ public class SqlKey {
         return new SqlKey(primaryKey, null, KeyType.PRIMITIVE, Relationship.ONETOMANYUNI);
     }
 
-    public static SqlKey NewSqlKey(R2JoinType annotation) {
-        KeyType keyType = annotation.foreignKey().split("\\,").length > 1 ? KeyType.FOREIGN_COMPOSITE : KeyType.FOREIGN_SINGLE;
-        return SqlKey.NewSqlKey(keyType, annotation.relationship(), annotation.foreignKey(), annotation.primaryKey());
-    }
-
     public static SqlKey TablePrimarySqlKey(String primaryKey) {
         return new SqlKey(primaryKey, null, KeyType.PRIMARY, Relationship.PRIMITIVE);
     }
