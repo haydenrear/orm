@@ -1,5 +1,6 @@
 package com.hayden.orm.table.service;
 
+import com.hayden.orm.table.exception.LackOfPrimaryKey;
 import com.hayden.orm.table.key.KeyType;
 import com.hayden.orm.table.mapper.DataType;
 import com.hayden.orm.table.mapper.SqlTable;
@@ -25,7 +26,11 @@ public class TestTableService {
         sqlTable.get().getColumnList().forEach(column -> {
             assertThat(column.getSqlKey().getPrimaryKey()).isEqualTo("id");
             assertThat(column.getSqlKey().getKeyType()).isEqualTo(KeyType.PRIMITIVE);
-            assertThat(column.getDataType()).isEqualTo(DataType.INT);
+            try {
+                assertThat(column.dataType()).isEqualTo(DataType.INT);
+            } catch (LackOfPrimaryKey lackOfPrimaryKey) {
+                lackOfPrimaryKey.printStackTrace();
+            }
             assertThat(column.getFieldType()).isEqualTo(int.class);
         });
     }
@@ -39,11 +44,21 @@ public class TestTableService {
 //                        System.out.println((column.getSqlKey().getKeyType()));
 //                        System.out.println((column.getDataType()));
 //                        System.out.println((column.getFieldType()));
-                        System.out.println((column.getDataType()));
+                        try {
+                            System.out.println((column.dataType()));
+                        } catch (LackOfPrimaryKey lackOfPrimaryKey) {
+                            lackOfPrimaryKey.printStackTrace();
+                        }
                         System.out.println(column.getSqlKey().getForeignKey());
                     });
                     return table;
                 });
+    }
+
+    @Test
+    public void testCreationDatabase(){
+        tableService.getTables();
+        System.out.println(tableService.createDatabaseCreationScript());
     }
 
 
