@@ -85,7 +85,7 @@ public class MetaMapper {
     public Optional<SqlColumn> getPrimaryKey(Class<?> entity) {
         for (Field f : entity.getDeclaredFields()){
             if(f.isAnnotationPresent(PrimaryKey.class)){
-                return Optional.of(new SqlColumn(SqlKey.PrimitiveSqlKey(f.getAnnotation(PrimaryKey.class).primaryKey()), entity));
+                return Optional.of(new SqlColumn(SqlKey.TablePrimarySqlKey(f.getAnnotation(PrimaryKey.class).primaryKey()), entity));
             }
         }
         return Optional.empty();
