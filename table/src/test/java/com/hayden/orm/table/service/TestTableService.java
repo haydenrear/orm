@@ -3,6 +3,7 @@ package com.hayden.orm.table.service;
 import com.hayden.orm.table.key.KeyType;
 import com.hayden.orm.table.mapper.DataType;
 import com.hayden.orm.table.mapper.SqlTable;
+import com.hayden.orm.table.testentities.TestOne;
 import com.hayden.orm.table.testentities.TestTwo;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,5 +29,22 @@ public class TestTableService {
             assertThat(column.getFieldType()).isEqualTo(int.class);
         });
     }
+
+    @Test
+    public void testForeignKey(){
+        tableService.getSqlTable(TestOne.class)
+                .map(table-> {
+                    table.getColumnList().forEach(column -> {
+                        System.out.println((column.getSqlKey().getPrimaryKey()));
+//                        System.out.println((column.getSqlKey().getKeyType()));
+//                        System.out.println((column.getDataType()));
+//                        System.out.println((column.getFieldType()));
+                        System.out.println((column.getDataType()));
+                        System.out.println(column.getSqlKey().getForeignKey());
+                    });
+                    return table;
+                });
+    }
+
 
 }

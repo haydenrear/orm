@@ -10,6 +10,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface R2JoinType {
+    /**
+     * if composite key please specify comma separated list of values with no spaces in between
+     * @return String that is name of foreign key
+     */
     public String foreignKey();
     public String primaryKey();
     public Relationship relationship();

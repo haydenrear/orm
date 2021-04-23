@@ -1,10 +1,8 @@
 package com.hayden.orm.table.key;
 
 import com.hayden.orm.table.annotations.R2JoinType;
-import com.hayden.orm.table.mapper.DataType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
 @Data
@@ -20,7 +18,7 @@ public class SqlKey {
     }
 
     public static SqlKey NewSqlKey(Relationship relationship, String foreign, String primary){
-        KeyType keyType = primary.length() >= 1 ? KeyType.PRIMARY_COMPOSITE : KeyType.PRIMARY_COMPOSITE;
+        KeyType keyType = foreign.split("\\,").length >= 1 ? KeyType.FOREIGN_COMPOSITE: KeyType.FOREIGN_SINGLE;
         return new SqlKey(primary, foreign, keyType, relationship);
     }
 
@@ -33,7 +31,7 @@ public class SqlKey {
     }
 
     public static SqlKey NewSqlKey(R2JoinType annotation) {
-        KeyType keyType = annotation.foreignKey().length() > 1 ? KeyType.PRIMARY_COMPOSITE : KeyType.PRIMARY_SINGLE;
+        KeyType keyType = annotation.foreignKey().split("\\,").length > 1 ? KeyType.FOREIGN_COMPOSITE : KeyType.FOREIGN_SINGLE;
         return SqlKey.NewSqlKey(keyType, annotation.relationship(), annotation.foreignKey(), annotation.primaryKey());
     }
-}
+ }

@@ -1,10 +1,12 @@
 package com.hayden.orm.table.service;
 
 import com.hayden.orm.table.annotations.TableName;
+import com.hayden.orm.table.exception.LackOfPrimaryKey;
+import com.hayden.orm.table.exception.MetaMappingException;
+import com.hayden.orm.table.exception.NotSqlTable;
 import com.hayden.orm.table.key.KeyType;
 import com.hayden.orm.table.mapper.*;
 import org.reflections8.Reflections;
-import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
 
 import java.util.*;
@@ -36,18 +38,19 @@ public class TableService {
         try {
             var primaryKey = metaMapper.getPrimaryKey(entity);
             if (primaryKey.isEmpty())
-                return Optional.empty();
+                throw new LackOfPrimaryKey();
+            if(entity.getAnnotation(TableName.class).tableName().length() == 0)
+                throw new NotSqlTable("No table name");
             return Optional.of(
                     new SqlTable(metaMapper.getColumns(entity),
                         entity,
                         entity.getAnnotation(TableName.class).tableName(),
-                        primaryKey.get().getT2(),
-                        primaryKey.get().getT1()
+                        primaryKey.get().getSqlKey().getPrimaryKey(),
+                        primaryKey.get().getFieldType()
                     )
             );
         } catch (MetaMappingException e) {
-            e.notAbleToGetColumnsFor(entity);
-            e.lackOfPrimaryKey(entity);
+            e.metaMappingException(entity);
         }
         return Optional.empty();
     }
@@ -64,7 +67,7 @@ public class TableService {
                    }
                    else {
                        stringBuilder.append(sqlColumn.getFieldType().getSimpleName()+" "+sqlColumn.getFieldType());
-                       writeKey(stringBuilder, sqlColumn.getSqlKey().getPrimaryKey(), KeyType.FOREIGN, sqlColumn.getFieldType());
+                       writeKey(stringBuilder, sqlColumn.getSqlKey().getForeignKey(), KeyType.FOREIGN, sqlColumn.getFieldType());
                    }
                    stringBuilder.append(",\n");
                });
@@ -72,8 +75,8 @@ public class TableService {
         return stringBuilder.toString();
     }
 
-    private void writeKey(StringBuilder stringBuilder, String primaryKey, KeyType keyType, Class<?> fieldType) {
-        stringBuilder.append(" "+primaryKey+" "+DataType.getDataType(fieldType)+" "+keyType.toString());
+    private void writeKey(StringBuilder stringBuilder, String key, KeyType keyType, Class<?> fieldType) {
+        stringBuilder.append(" "+key+" "+DataType.getDataType(fieldType)+" "+keyType.toString());
     }
 
 
