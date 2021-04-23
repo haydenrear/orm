@@ -75,13 +75,6 @@ public class MetaMapper {
         return tableType.isAnnotationPresent(TableName.class);
     }
 
-    public DataType dataTypeFromField(Field field){
-        if(field.getType().isAssignableFrom(Integer.class) || field.getType().isAssignableFrom(int.class)){
-            return DataType.INT;
-        }
-        return DataType.DATE;
-    }
-
     public Optional<SqlColumn> getPrimaryKey(Class<?> entity) {
         for (Field f : entity.getDeclaredFields()){
             if(f.isAnnotationPresent(PrimaryKey.class)){

@@ -62,7 +62,7 @@ public class TableService {
         tables.forEach(table -> {
 
             stringBuilder.append("\n");
-            stringBuilder.append("CREATE TABLE [IF NOT EXISTS] " + table.getTableName() + " (");
+            stringBuilder.append("CREATE TABLE IF NOT EXISTS " + table.getTableName() + " (");
             stringBuilder.append("\n");
 
             writeColumn(stringBuilder, table.getPrimaryKey());
@@ -89,7 +89,7 @@ public class TableService {
             DataType dataType = sqlColumn.dataType();
             String columnIdAndDataType = getIdString(columnKeyString, dataType);
             String keyTypeString = keyString(sqlColumn, keyType);
-            String primaryOrForeignKey = getKeyString(keyTypeString, keyType);
+            String primaryOrForeignKey = getKeyString(keyTypeString, keyType, sqlColumn);
 
             stringBuilder
                 .append(" ")
@@ -109,16 +109,16 @@ public class TableService {
         return keyType == KeyType.FOREIGN ? sqlColumn.getSqlKey().getForeignKey() : sqlColumn.getSqlKey().getPrimaryKey();
     }
 
-    private String getKeyStringSupp(KeyType keyType, String key, BiFunction<KeyType, String, String> supp){
-        return supp.apply(keyType, key);
-    }
-
-    private String getKeyString(String key, KeyType keyType) {
-        return getKeyStringSupp(keyType, key, (keyString, keyTypeVal) -> keyString +"("+keyTypeVal+")");
+    private String getKeyString(String key, KeyType keyType, SqlColumn sqlColumn) {
+        String toAdd = "";
+        if(keyType.toString().equals(KeyType.FOREIGN.toString())) {
+            toAdd = " REFERENCES " + sqlColumn.getFieldType().getAnnotation(TableName.class).tableName() + "(" + sqlColumn.getSqlKey().getForeignKey() + ")";
+        }
+        return keyType+"("+key+")"+toAdd;
     }
 
     private String getIdString(String key, DataType dataType)  {
-        return getKeyStringSupp(null, key, ((keyType1, s) -> s+" "+dataType));
+        return key+" "+dataType;
     }
 
 

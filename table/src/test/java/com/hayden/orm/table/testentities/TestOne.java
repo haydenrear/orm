@@ -12,7 +12,7 @@ public class TestOne {
     @PrimaryKey(primaryKey = "id")
     int id;
 
-    @R2Column @R2JoinType(primaryKey = "id", foreignKey = "id", relationship = Relationship.ONETOONEBI)
+//    @R2Column @R2JoinType(primaryKey = "id", foreignKey = "id", relationship = Relationship.ONETOONEBI)
     TestOne testOne;
 
 }

@@ -25,12 +25,4 @@ class TableApplicationTests {
         assertThat(intClass.isPrimitive()).isTrue();
     }
 
-    @Test
-    void testDataTypeMapper() throws NoSuchFieldException {
-        Field field = this.getClass().getField("field");
-        MetaMapper metaMapper = new MetaMapper();
-        assertThat(metaMapper.dataTypeFromField(field)).isEqualTo(DataType.INT);
-    }
-
-
 }
