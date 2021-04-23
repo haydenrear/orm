@@ -7,11 +7,8 @@ import com.hayden.orm.table.exception.NotSqlTable;
 import com.hayden.orm.table.key.KeyType;
 import com.hayden.orm.table.mapper.*;
 import org.reflections8.Reflections;
-import org.springframework.util.ClassUtils;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class TableService {

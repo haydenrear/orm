@@ -1,8 +1,11 @@
 package com.hayden.orm.table.key;
 
+import com.hayden.orm.table.annotations.PrimitiveCollection;
 import com.hayden.orm.table.annotations.R2JoinType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.lang.annotation.Annotation;
 
 @AllArgsConstructor
 @Data
@@ -26,8 +29,8 @@ public class SqlKey {
         return new SqlKey(primaryKey, null, KeyType.PRIMITIVE, Relationship.PRIMITIVE);
     }
 
-    public static SqlKey NewSqlKey(String foreignKey, String primaryKey) {
-        return null;
+    public static SqlKey PrimitiveCollection(Annotation annotation, String primaryKey){
+        return new SqlKey(primaryKey, null, KeyType.PRIMITIVE, Relationship.ONETOMANYUNI);
     }
 
     public static SqlKey NewSqlKey(R2JoinType annotation) {

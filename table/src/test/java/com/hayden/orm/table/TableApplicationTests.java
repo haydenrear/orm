@@ -24,5 +24,4 @@ class TableApplicationTests {
         Class<Integer> intClass = Integer.class;
         assertThat(intClass.isPrimitive()).isTrue();
     }
-
 }

@@ -9,10 +9,10 @@ import com.hayden.orm.table.key.Relationship;
 @TableName(tableName = "TestTwo")
 public class TestTwo {
 
-    @PrimaryKey(primaryKey = "id")
-    long id;
+    @PrimaryKey(primaryKey = "testTwoId")
+    long testTwoId;
 
-    @R2Column @R2JoinType(primaryKey = "id", foreignKey = "id", relationship = Relationship.ONETOONEBI)
+    @R2Column @R2JoinType(foreignKey = "testOneId", relationship = Relationship.ONETOONEBI)
     TestTwo testColumn;
 
 }

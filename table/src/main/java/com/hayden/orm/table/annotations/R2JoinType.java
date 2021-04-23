@@ -15,6 +15,5 @@ public @interface R2JoinType {
      * @return String that is name of foreign key
      */
     public String foreignKey();
-    public String primaryKey();
     public Relationship relationship();
 }
