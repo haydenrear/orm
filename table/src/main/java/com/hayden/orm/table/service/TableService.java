@@ -10,6 +10,7 @@ import org.reflections8.Reflections;
 import org.springframework.util.ClassUtils;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class TableService {
@@ -61,13 +62,16 @@ public class TableService {
             stringBuilder.append("\n");
             stringBuilder.append("CREATE TABLE [IF NOT EXISTS] " + table.getTableName() + " (");
             stringBuilder.append("\n");
+            writeColumn(stringBuilder, table.getPrimaryKey());
             writeKey(stringBuilder, table.getPrimaryKey(), KeyType.PRIMARY);
             stringBuilder.append(",\n");
 
             table.getColumnList().forEach(sqlColumn -> {
                 if (ClassUtils.isPrimitiveOrWrapper(sqlColumn.getFieldType())) {
+                    writeColumn(stringBuilder, sqlColumn);
                     writeKey(stringBuilder, sqlColumn, KeyType.PRIMITIVE);
                 } else {
+                    writeColumn(stringBuilder, sqlColumn);
                     writeKey(stringBuilder, sqlColumn, KeyType.FOREIGN);
                 }
                 stringBuilder.append(",\n");
@@ -81,27 +85,44 @@ public class TableService {
         return stringBuilder.toString();
     }
 
+    private void writeColumn(StringBuilder stringBuilder, SqlColumn sqlColumn) {
+        KeyType keyType = sqlColumn.getSqlKey().getKeyType();
+        String keyString = keyType == KeyType.FOREIGN ? sqlColumn.getSqlKey().getForeignKey() : sqlColumn.getSqlKey().getPrimaryKey();
+        try {
+            DataType dataType = sqlColumn.dataType();
+            String key = getIdString(keyString, dataType);
+            stringBuilder.append(" ")
+            .append(key)
+            .append(",\n");
+        } catch (LackOfPrimaryKey lackOfPrimaryKey) {
+            lackOfPrimaryKey.printStackTrace();
+        }
+    }
+
     private void writeKey(StringBuilder stringBuilder, SqlColumn sqlColumn, KeyType keyType) {
-        String key = "";
-        if (keyType == KeyType.PRIMARY)
-            key = sqlColumn.getSqlKey().getPrimaryKey();
-        else if(keyType == KeyType.FOREIGN)
-            key = sqlColumn.getSqlKey().getForeignKey();
-        else if (keyType == KeyType.PRIMITIVE)
-            key = "";
+        String keyString = keyType == KeyType.PRIMARY ? sqlColumn.getSqlKey().getPrimaryKey() : sqlColumn.getSqlKey().getForeignKey();
+        String key = getKeyString(keyString, keyType);
         try {
             stringBuilder.append(" ")
-                    .append(key)
-                    .append(" ")
                     .append(sqlColumn.dataType())
                     .append(" ")
-                    .append(keyType.toString());
+                    .append(key);
         } catch (LackOfPrimaryKey lackOfPrimaryKey) {
             lackOfPrimaryKey.metaMappingException(sqlColumn.getFieldType());
         }
     }
 
+    private String getKeyStringSupp(KeyType keyType, String key, BiFunction<KeyType, String, String> supp){
+        return supp.apply(keyType, key);
+    }
 
+    private String getKeyString(String key, KeyType keyType) {
+        return getKeyStringSupp(keyType, key, (keyString, keyTypeVal) -> keyTypeVal +"("+keyString+")");
+    }
+
+    private String getIdString(String key, DataType dataType)  {
+        return getKeyStringSupp(null, key, ((keyType1, s) -> s+" "+dataType));
+    }
 
 
 }
