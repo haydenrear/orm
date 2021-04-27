@@ -19,6 +19,15 @@ public class TestTableService {
 
     TableService tableService = new TableService();
 
+
+    @Test
+    public void testRef(){
+        TableService tableService = new TableService();
+        tableService
+                .findEntities()
+                .forEach(System.out::println);
+    }
+
     @Test
     public void testTableService(){
         assertThat(tableService.findEntities().size()).isEqualTo(2);

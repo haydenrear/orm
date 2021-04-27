@@ -19,9 +19,4 @@ class TableApplicationTests {
     void contextLoads() {
     }
 
-    @Test
-    void testPrimitives(){
-        Class<Integer> intClass = Integer.class;
-        assertThat(intClass.isPrimitive()).isTrue();
-    }
 }

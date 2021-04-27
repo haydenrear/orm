@@ -1,7 +1,5 @@
 package com.hayden.orm.table.key;
 
-import com.hayden.orm.table.annotations.PrimitiveCollection;
-import com.hayden.orm.table.annotations.R2JoinType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
