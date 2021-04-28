@@ -87,15 +87,14 @@ public class TableService {
             String columnIdAndDataType = getIdString(columnKeyString, dataType);
             String keyTypeString = keyString(sqlColumn, keyType);
             String primaryOrForeignKey = getKeyString(keyTypeString, keyType, sqlColumn);
+            String keyLine = "";
+            if(!sqlColumn.getSqlKey().getKeyType().equals(KeyType.PRIMITIVE))
+                keyLine = ",\n "+sqlColumn.dataType()+" "+primaryOrForeignKey;
 
             stringBuilder
                 .append(" ")
                 .append(columnIdAndDataType)
-                .append(",\n")
-                .append(" ")
-                .append(sqlColumn.dataType())
-                .append(" ")
-                .append(primaryOrForeignKey);
+                .append(keyLine);
 
         } catch (LackOfPrimaryKey lackOfPrimaryKey) {
             lackOfPrimaryKey.printStackTrace();
