@@ -88,6 +88,7 @@ public class TableService {
             String keyTypeString = keyString(sqlColumn, keyType);
             String primaryOrForeignKey = getKeyString(keyTypeString, keyType, sqlColumn);
             String keyLine = "";
+
             if(!sqlColumn.getSqlKey().getKeyType().equals(KeyType.PRIMITIVE))
                 keyLine = ",\n "+sqlColumn.dataType()+" "+primaryOrForeignKey;
 
