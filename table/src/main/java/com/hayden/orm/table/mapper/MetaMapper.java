@@ -42,8 +42,8 @@ public class MetaMapper {
 
 
     private SqlColumn getSqlColumn(String primaryKey, Field f) throws MetaMappingException {
-        if(ClassUtils.isPrimitiveOrWrapper(f.getType())){
-            return new SqlColumn(SqlKey.PrimitiveSqlKey(primaryKey), f.getType());
+        if(ClassUtils.isPrimitiveOrWrapper(f.getType()) && f.isAnnotationPresent(R2Column.class)){
+            return new SqlColumn(SqlKey.PrimitiveSqlKey(f.getName()), f.getType());
         }
         if (!isTableExisting(f.getType()) ) {
             throw new MetaMappingException();

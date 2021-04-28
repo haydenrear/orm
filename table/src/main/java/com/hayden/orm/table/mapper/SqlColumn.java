@@ -1,7 +1,9 @@
 package com.hayden.orm.table.mapper;
 
 import com.hayden.orm.table.annotations.PrimaryKey;
+import com.hayden.orm.table.annotations.R2Column;
 import com.hayden.orm.table.exception.LackOfPrimaryKey;
+import com.hayden.orm.table.key.KeyType;
 import com.hayden.orm.table.key.SqlKey;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -27,6 +29,9 @@ public class SqlColumn{
     }
 
     public DataType dataType() throws LackOfPrimaryKey {
+        if(sqlKey.getKeyType().equals(KeyType.PRIMITIVE)){
+            return DataType.getDataType(fieldType);
+        }
         return Arrays
                 .stream(fieldType.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(PrimaryKey.class))
@@ -34,7 +39,7 @@ public class SqlColumn{
                 .map(DataType::getDataType)
                 .filter(dataType1 -> dataType1!=DataType.COMPLEX)
                 .findFirst()
-                .orElseThrow(() -> new LackOfPrimaryKey("primary key may not be of primitive type"));
+                .orElseThrow(() -> new LackOfPrimaryKey("primary key may only be of primitive type"));
     }
 
     public SqlKey getSqlKey() {

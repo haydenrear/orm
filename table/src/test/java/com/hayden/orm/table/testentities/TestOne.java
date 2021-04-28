@@ -15,4 +15,7 @@ public class TestOne {
     @R2Column @R2JoinType(foreignKey = "testTwoId", relationship = Relationship.ONETOONEBI)
     TestOne testOne;
 
+    @R2Column
+    int another;
+
 }
