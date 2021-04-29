@@ -46,7 +46,7 @@ public class TestTableService {
 
     @Test
     public void testForeignKey(){
-        tableService.getSqlTable(TestOne.class)
+        tableService.getSqlTable(TestTwo.class)
                 .map(table-> {
                     table.getColumnList().forEach(column -> {
                         System.out.println((column.getSqlKey().getPrimaryKey()));

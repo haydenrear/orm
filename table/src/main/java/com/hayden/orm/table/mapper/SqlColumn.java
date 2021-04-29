@@ -29,9 +29,8 @@ public class SqlColumn{
     }
 
     public DataType dataType() throws LackOfPrimaryKey {
-        if(sqlKey.getKeyType().equals(KeyType.PRIMITIVE)){
+        if(!sqlKey.getKeyType().toString().equals(KeyType.FOREIGN.toString()))
             return DataType.getDataType(fieldType);
-        }
         return Arrays
                 .stream(fieldType.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(PrimaryKey.class))

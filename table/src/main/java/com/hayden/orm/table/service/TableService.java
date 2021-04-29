@@ -8,6 +8,7 @@ import com.hayden.orm.table.key.KeyType;
 import com.hayden.orm.table.mapper.*;
 import org.reflections8.Reflections;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,7 +104,7 @@ public class TableService {
     }
 
     private String keyString(SqlColumn sqlColumn, KeyType keyType) {
-        return keyType == KeyType.FOREIGN ? sqlColumn.getSqlKey().getForeignKey() : sqlColumn.getSqlKey().getPrimaryKey();
+        return keyType.toString().equals(KeyType.FOREIGN.toString()) ? sqlColumn.getSqlKey().getForeignKey() : sqlColumn.getSqlKey().getPrimaryKey();
     }
 
     private String getKeyString(String key, KeyType keyType, SqlColumn sqlColumn) {

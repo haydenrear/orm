@@ -10,10 +10,10 @@ import com.hayden.orm.table.key.Relationship;
 public class TestOne {
 
     @PrimaryKey(primaryKey = "testOneId")
-    int testOneId;
+    String testOneId;
 
     @R2Column @R2JoinType(foreignKey = "testTwoId", relationship = Relationship.ONETOONEBI)
-    TestOne testOne;
+    TestTwo testTwo;
 
     @R2Column
     int another;

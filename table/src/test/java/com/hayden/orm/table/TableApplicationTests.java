@@ -14,9 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TableApplicationTests {
 
     public int field;
+    public String stringField = "hello";
 
     @Test
     void contextLoads() {
+        assertThat(ClassUtils.isPrimitiveOrWrapper(stringField.getClass())).isTrue();
     }
 
 }

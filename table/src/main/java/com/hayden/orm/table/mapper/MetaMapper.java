@@ -29,7 +29,7 @@ public class MetaMapper {
         SqlColumn primaryKey = primaryKeyOptional.get();
 
         return Arrays.stream(table.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(R2Column.class))
+                .filter(field -> field.isAnnotationPresent(R2Column.class) && !field.isAnnotationPresent(PrimaryKey.class))
                 .flatMap(field -> {
                     try {
                         return Stream.of(getSqlColumn(primaryKey.getSqlKey().getPrimaryKey(), field));
@@ -42,11 +42,8 @@ public class MetaMapper {
 
 
     private SqlColumn getSqlColumn(String primaryKey, Field f) throws MetaMappingException {
-        if(ClassUtils.isPrimitiveOrWrapper(f.getType()) && f.isAnnotationPresent(R2Column.class)){
-            return new SqlColumn(SqlKey.PrimitiveSqlKey(f.getName()), f.getType());
-        }
-        if (!isTableExisting(f.getType()) ) {
-            throw new MetaMappingException();
+        if((ClassUtils.isPrimitiveOrWrapper(f.getType()) || f.getType().equals(String.class))){
+            return new SqlColumn(SqlKey.PrimitiveSqlKey(primaryKey), f.getType());
         }
         else{
             if (isTableExisting(f.getType()) && f.isAnnotationPresent(R2JoinType.class)) {
@@ -69,7 +66,7 @@ public class MetaMapper {
     public Optional<SqlColumn> getPrimaryKey(Class<?> entity) {
         return Arrays.stream(entity.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(PrimaryKey.class))
-                .map(f -> new SqlColumn(SqlKey.TablePrimarySqlKey(f.getAnnotation(PrimaryKey.class).primaryKey()), entity))
+                .map(f -> new SqlColumn(SqlKey.TablePrimarySqlKey(f.getAnnotation(PrimaryKey.class).primaryKey()), f.getType()))
                 .findFirst();
     }
 }
